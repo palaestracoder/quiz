@@ -1,0 +1,24 @@
+{
+  "name": "quiz",
+  "version": "1.0.0",
+  "description": "Palaestra Spring 2023 Quiz Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/palaestracoder/quiz.git"
+  },
+  "author": "The Palaestra Students",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/palaestracoder/quiz/issues"
+  },
+  "homepage": "https://github.com/palaestracoder/quiz#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "redis": "^4.6.5"
+  },
+  "type": "module"
+}
