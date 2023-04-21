@@ -5,3 +5,4 @@ created from the Browser, and then lets multiple people take
 the quiz at the same time.
 
 Mr. Schmidt
+Teacher
