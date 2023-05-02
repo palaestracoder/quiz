@@ -7,11 +7,23 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Quiz Program (week 10)",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\index.js",
+            
+            // tell VSCode to use its built-in terminal to run this web server program
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Test Quiz Program (week 10)",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\test.js",
             
             // tell VSCode to use its built-in terminal to run this web server program
             "console": "integratedTerminal"
