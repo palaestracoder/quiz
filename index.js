@@ -28,6 +28,25 @@ app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
     res.redirect()
 })
 
+app.post('/take/:quizName/:userName/score', urlencodedParser, async (req, res) => {
+    var correctAnswerKeys = await db.keys(`${req.params.quizName}-answer-*`)
+    var takerAnswerKeys = await db.keys(`${req.params.quizName}-${req.params.userName}-*`)
+
+    var score = 0
+    var total = 0
+    for (var i = 0 ; i < correctAnswerKeys.length ; i++) {
+        var correctAnswer = await db.get(correctAnswerKeys[i])
+        var takerAnswer = await db.get(takerAnswerKeys[i])
+        if (takerAnswer == correctAnswer) {
+            score++
+        }
+        total++
+    }
+
+    res.send(`<!DOCTYPE html><html><body>Your score is ${score} of ${total} questions</body></html>`)
+})
+
+
 // all configuration is done, now let's have express listen for Browser connections
 // on port 80 (the standard port for HTTP)
 app.listen(80, () => {
