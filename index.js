@@ -1,7 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import redis from 'redis'
-
 // make the one and only express object     -   done?
 const app = express()
 
@@ -16,6 +15,9 @@ await db.connect()     // if this errors, make sure redis is running    -   done
 // this route serves static files
 app.use(express.static('public'))
 
+app.get('/', async (req,res) => {
+    res.redirect('/form.html')
+})
 // this route serves the home page, using code
 app.post('/add', urlencodedParser, async (req, res) => {
     await db.set("form-data", req.body.answerText)
