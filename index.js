@@ -13,8 +13,6 @@ await db.connect()
 
 app.use(express.static('public'))
 
-
-
 app.get('/', async(req, res) => {
     res.send(`<!DOCTYPE html><html><body><A href="/home.html">Say Hello</A></body></html>`)
 })
@@ -43,7 +41,7 @@ app.post('/add', urlencodedParser, async(req, res) => {
                 <h2>Type the Answer Below:</h2>
                 <input type="text" id="answerText" name="answerText"><br />
                 <br />
-                <button type="submit">Submit This Question</button>
+                <button type="submit">Click Here to Submit This Question</button>
             </form>
     </body>
     </html>`)
@@ -79,7 +77,7 @@ app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
                     <button type="submit">Click Here to Submit This Question</button>
                 </form>
                 <br />
-                <a href="http://localhost/home.html">Done</a>
+                Simply click <a href="http://localhost/home.html">done</a> when you're finished adding questions!
     </body>
     </html>`)    
 })
