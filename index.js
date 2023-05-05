@@ -62,7 +62,7 @@ app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
 
     await db.set(`${quizName}-question-${count}`, questionText)
     await db.set(`${quizName}-answer-${count}`, answerText)
-    //await db.hIncr("questionCount", quizName) It says that hIncr() isn't a function
+    //await db.hIncr("questionCount", quizName)  It says that hIncr() isn't a function
 
     res.send(`<!DOCTYPE html>
     <html>
