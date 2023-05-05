@@ -1,23 +1,21 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import redis from 'redis'
-// make the one and only express object     -   done?
+
+// make the one and only express object
 const app = express()
 
-// make a database connection to redis      -   done?
+// make a database connection to redis 
 var urlencodedParser = bodyParser.urlencoded({ extended: false})
 const db = redis.createClient({
     url: 'redis://localhost:6379'
 })
-await db.connect()       // if this errors, make sure redis is running    -   done?
+await db.connect()       // if this errors, make sure redis is running
 
 // add routes
 // this route serves static files
 app.use(express.static('public'))
 
-app.get('/', async (req,res) => {
-    res.redirect('/form.html')
-})
 // this route serves the home page, using code
 app.get('/', async(req, res) => {
     res.redirect(`home.html`)
@@ -51,7 +49,7 @@ app.post('/add', urlencodedParser, async(req, res) => {
 
 app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
     var quizName = req.params.quizName
-    var count = req.params.count
+    var count = Number(req.params.count)
     
     console.log(`The name of this quiz is: ${quizName}`) //TEMP
     console.log(`This is question ${count}`) //TEMP
@@ -68,10 +66,10 @@ app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
     res.send(`<!DOCTYPE html>
     <html>
     <head>
-        <title>Question ${count}</title>
+        <title>Question ${nextCount}</title>
     </head>
     <body>
-        <h1>Question ${count}:</h1>
+        <h1>Question ${nextCount}:</h1>
             <h2>Add Your Question Below:</h2>
                 <form action="/add/${quizName}/${nextCount}" method="post">
                     <textarea id="questionText" name="questionText" rows="5" cols="40"></textarea>
