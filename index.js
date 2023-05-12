@@ -72,7 +72,8 @@ app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
                 <form action="/add/${quizName}/${nextCount}" method="post">
                     <textarea id="questionText" name="questionText" rows="5" cols="40"></textarea>
                     <h2>Add Its Answer Below:</h2>
-                    <input type="text" id="answerText" name="answerText">
+                    <input type="text" id="answerText" name="answerText"><br />
+                    <br />
                     <button type="submit">Click Here to Submit This Question</button>
                 </form>
                 <br />
@@ -113,6 +114,7 @@ app.post('/take', urlencodedParser, async(req, res) => {
         <body>
             <h1>Sorry, this quiz does not exist</h1>
                 Perhaps you could check your spelling, capitalization, and punctuation if you believe there is an issue.<br />
+                Also, the quiz you entered may have been deleted.<br />
                 <br />
                 <strong>Don't worry; click <em><a href="http://localhost">here</a></em> to return to the homepage.</strong>
         </body>
@@ -156,15 +158,18 @@ app.post('/take/:quizName/:userName/:questionNum', urlencodedParser, async(req, 
     const questionText = req.body.questionText
     const answerText = req.body.answerText
 
+    const questionCount = await db.hGet("questionCount", quizName)
+
     const suspicious = await db.get(`${quizName}-question-${questionNum}`, questionText)
 
-    if (suspicious == null) {
+    if (questionCount == previousQuestionNum) {
+
         console.log("suspicious stuff is happening")  // TEMP
         res.redirect(`/take/${quizName}/${userName}/score`)
+
     } else {
 
-        await db.get(`${quizName}-answer-${questionNum}`, answerText)
-        await db.hSet("questionCount", quizName, questionNum) 
+        await db.get(`${quizName}-answer-${questionNum}`, answerText) 
 
         res.send(`<!DOCTYPE html>
         <html>
@@ -208,7 +213,7 @@ app.get('/take/:quizName/:userName/score', urlencodedParser, async(req, res) => 
 
         var takerAnswer = await db.get(takerAnswerKeys[i])
         var b = takerAnswer.toLowerCase()
-        console.log(`The user's answer in lowercase is ${b}`)  // TEMP
+        console.log(`${userName}'s answer in lowercase is ${b}`)  // TEMP
 
         if (a == b) {
             score++
@@ -253,21 +258,40 @@ app.post('/delete', urlencodedParser, async(req, res) => {
 
     const keys = await db.keys(`${quizName}-*`)
     console.log(keys)  //TEMP
-    await db.del(keys)
-    
-    const checkForKeys = await db.keys(`${quizName}-*`)  // TEMP
-    console.log(checkForKeys)  // TEMP
 
-    res.send(`<!DOCTYPE html>
+    if (keys == '') {
+
+        res.send(`<DOCTYPE html>
         <html>
         <head>
-            <title>Quiz Deleted successfully</title>
-        </head>    
+            <title>Error</title>
+        </head>
         <body>
-            <h3> Quiz Deleted successfully <h3>
-            <h4><a href="http://localhost/home.html">Homepage</a></h4>
+            <h1>Whoops! This quiz didn't even exist in the first place!</h1>
+                <strong>Don't worry, just click <em><a href="http://localhost">here</a></em> to return to the homepage.</strong>
         </body>
         </html>`)
+
+    } else {
+        
+        console.log("del is running")  // TEMP
+        await db.del(keys) 
+    
+        const checkForKeys = await db.keys(`${quizName}-*`)  // TEMP
+        console.log(checkForKeys)  // TEMP
+
+        res.send(`<!DOCTYPE html>
+            <html>
+            <head>
+                <title>Quiz Deleted successfully</title>
+            </head>    
+            <body>
+                <h3> Quiz Deleted successfully <h3>
+                <h4><a href="http://localhost/home.html">Homepage</a></h4>
+            </body>
+            </html>`)
+
+    }
 })
 
 // all configuration is done, now let's have express listen for Browser connections
