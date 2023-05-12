@@ -102,8 +102,6 @@ app.post('/take', urlencodedParser, async(req, res) => {
     var firstQuestion = await db.get(`${quizName}-question-1`)
     console.log(`The first question is ${firstQuestion}`)  // TEMP
     
-    await db.hGet('questionCount', quizName, '0') 
-    
     //Here's a little add-on that sends an error if the quiz entered does not exist
     if (firstQuestion == null) {
         res.send(`<!DOCTYPE html>
@@ -196,32 +194,44 @@ app.get('/take/:quizName/:userName/score', urlencodedParser, async(req, res) => 
     const quizName = req.params.quizName
     const userName = req.params.userName
 
-    var correctAnswerKeys = await db.keys(`${quizName}-answer-*`)
-    correctAnswerKeys.sort()  //Even if these don't get sorted in the order they were answered, this should work
-    var takerAnswerKeys = await db.keys(`${quizName}-${userName}-*`)
-    takerAnswerKeys.sort()
-
     var score = 0
     var total = 0
     var incorrect = 0
-    var g 
+    var g
+    
+    var table = `<table>`
+    table += `<tr style="border: 1px solid black">`
+    table += `<th style="border: 1px solid black">Question</th>`
+    table += `<th style="border: 1px solid black">Your Answer</th>`
+    table += `<th style="border: 1px solid black">Result</th>`
+    table += "</tr>"
 
-    for(var i = 0; i < correctAnswerKeys.length; i++) {
-        var correctAnswer = await db.get(correctAnswerKeys[i])
-        var a = correctAnswer.toLowerCase()
-        console.log(`The correct answer in lowercase is ${a}`)  // TEMP
+    const questionCount = await db.hGet("questionCount", quizName)
 
-        var takerAnswer = await db.get(takerAnswerKeys[i])
-        var b = takerAnswer.toLowerCase()
-        console.log(`${userName}'s answer in lowercase is ${b}`)  // TEMP
+    for(var i = 1; i <= questionCount; i++) {
+        table += `<tr style="border: 1px solid black">`
 
-        if (a == b) {
+        var question = await db.get(`${quizName}-question-${i}`)
+        var correctAnswer = await db.get(`${quizName}-answer-${i}`)
+        var takerAnswer = await db.get(`${quizName}-${userName}-${i}`)
+
+        table += `<td style="border: 1px solid black">${question}</td>`
+        table += `<td style="border: 1px solid black">${takerAnswer}</td>`
+
+        var isCorrect = (correctAnswer.toLowerCase().trim() == takerAnswer.toLowerCase().trim())
+        table += `<td style="border: 1px solid black">${isCorrect ? "CORRECT" : `INCORRECT - try ${correctAnswer} next time`}</td>`
+
+        if (isCorrect) {
             score++
         } else {
             incorrect++
         }
         total++
+
+        table += "</tr>"
     }
+
+    table += "</table>"
 
     const quotient = Math.floor(100 / total)
     var percent = Math.round(quotient * score)
@@ -240,6 +250,8 @@ app.get('/take/:quizName/:userName/score', urlencodedParser, async(req, res) => 
         </head>
         <body>
             <h1>${userName}'s Score on "${quizName}"</h1>
+                <h2>Your Results:</h2>
+                    ${table}
                 <h2>Number Correct:</h2>
                     <strong>${score} out of ${total}</strong>
                 <h2>Number Incorrect:</h2>
