@@ -24,7 +24,7 @@ app.get('/', async(req, res) => {
 app.post('/add', urlencodedParser, async(req, res) => {
     var quizName = req.body.quizName
     console.log(quizName) // TEMP
-    await db.hSet('questionCount', quizName, '0')
+    await db.hSet('questionCount', quizName, '0') 
     
     res.send(`<!DOCTYPE html>
     <html>
@@ -57,12 +57,10 @@ app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
     const questionText = req.body.questionText
     const answerText = req.body.answerText
 
-
     await db.set(`${quizName}-question-${count}`, questionText)
     await db.set(`${quizName}-answer-${count}`, answerText)
     await db.hSet("questionCount", quizName, count) 
-    var nextCount = count + 1  //Why does this just put a "1" next to count instead of mathimatically adding them?
-
+    var nextCount = count + 1  
     res.send(`<!DOCTYPE html>
     <html>
     <head>
@@ -78,25 +76,22 @@ app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
                     <button type="submit">Click Here to Submit This Question</button>
                 </form>
                 <br />
-                Simply click <a href="http://localhost/home.html">done</a> when you're finished adding questions!
+                <strong>Simply click <em><a href="http://localhost/home.html">done</a></em> when you're finished adding questions!</strong>
     </body>
     </html>`)    
 })
 
-////
-////
-////These are the /take routes
+///
+///
+///These are the /take routes
 
 app.post('/take', urlencodedParser, async(req, res) => {
     console.log("This makes sure that this is running properly")  // TEMP
     
-    var quizName = req.body.userName
-    const inCase = 'Sorry, this quiz does not exist.'
-    if (quizName == '') {
-        quizName = inCase
-    }
+    var quizName = req.body.quizName
+    console.log(quizName)  // TEMP
 
-    var userName = req.body.quizName
+    var userName = req.body.userName
     if (userName == '') {
         userName = 'unknown user'
     }
@@ -104,19 +99,21 @@ app.post('/take', urlencodedParser, async(req, res) => {
     console.log(quizName) // TEMP
     
     var firstQuestion = await db.get(`${quizName}-question-1`)
-    if (firstQuestion == null) {
-        firstQuestion = "Sorry, this thing your on doesn't exist :("
-    }
+    console.log(`The first question is ${firstQuestion}`)  // TEMP
+    
     await db.hGet('questionCount', quizName, '0') 
     
-    if (quizName == inCase) {
+    //Here's a little add-on that sends an error if the quiz entered does not exist
+    if (firstQuestion == null) {
         res.send(`<!DOCTYPE html>
         <html>
         <head>
             <title>Error</title>
         </head>
         <body>
-            <h1>${inCase}</h1>
+            <h1>Sorry, this quiz does not exist</h1>
+                Perhaps you could check your spelling, capitalization, and punctuation if you believe there is an issue.<br />
+                <br />
                 <strong>Don't worry; click <em><a href="http://localhost">here</a></em> to return to the homepage.</strong>
         </body>
        </html>`)
@@ -153,8 +150,8 @@ app.post('/take/:quizName/:userName/:questionNum', urlencodedParser, async(req, 
     var userInput = req.body.userInput
     await db.set(`${quizName}-${userName}-${previousQuestionNum}`, `${userInput}`)
     
-    console.log(`The name of this quiz is: ${quizName}`) //TEMP
-    console.log(`This is question ${questionNum}`) //TEMP
+    console.log(`The name of this quiz is: ${quizName}`) // TEMP
+    console.log(`This is question ${questionNum}`) // TEMP
     
     const questionText = req.body.questionText
     const answerText = req.body.answerText
@@ -162,7 +159,7 @@ app.post('/take/:quizName/:userName/:questionNum', urlencodedParser, async(req, 
     const suspicious = await db.get(`${quizName}-question-${questionNum}`, questionText)
 
     if (suspicious == null) {
-        console.log("suspicious stuff is happening")  //TEMP
+        console.log("suspicious stuff is happening")  // TEMP
         res.redirect(`/take/${quizName}/${userName}/score`)
     } else {
 
@@ -184,7 +181,7 @@ app.post('/take/:quizName/:userName/:questionNum', urlencodedParser, async(req, 
                         <button type="submit">Click Here to Submit Your Answer</button>
                 </form>
                 <br />
-                Simply click <a href="http://localhost/home.html">done</a> if you get bored!
+                <strong>Simply click <em><a href="http://localhost/home.html">done</a></em> if you get bored!</strong>
         </body>
         </html>`)
     }
@@ -193,16 +190,6 @@ app.post('/take/:quizName/:userName/:questionNum', urlencodedParser, async(req, 
 app.get('/take/:quizName/:userName/score', urlencodedParser, async(req, res) => {
     const quizName = req.params.quizName
     const userName = req.params.userName
-    
-    ///var questionQuantity = 0
-
-    ///for (var loopVar = 0; loopVar < 999999999999999; loopVar++) {
-    ///    var g = await db.get(`${quizName}-question-${loopVar}`)
-    ///    if (g == null) {
-    ///        break
-    ///    }
-    ///    questionQuantity++
-    ///}
 
     var correctAnswerKeys = await db.keys(`${quizName}-answer-*`)
     correctAnswerKeys.sort()  //Even if these don't get sorted in the order they were answered, this should work
@@ -212,11 +199,18 @@ app.get('/take/:quizName/:userName/score', urlencodedParser, async(req, res) => 
     var score = 0
     var total = 0
     var incorrect = 0
+    var g 
 
     for(var i = 0; i < correctAnswerKeys.length; i++) {
         var correctAnswer = await db.get(correctAnswerKeys[i])
+        var a = correctAnswer.toLowerCase()
+        console.log(`The correct answer in lowercase is ${a}`)  // TEMP
+
         var takerAnswer = await db.get(takerAnswerKeys[i])
-        if (takerAnswer == correctAnswer) {
+        var b = takerAnswer.toLowerCase()
+        console.log(`The user's answer in lowercase is ${b}`)  // TEMP
+
+        if (a == b) {
             score++
         } else {
             incorrect++
@@ -225,8 +219,14 @@ app.get('/take/:quizName/:userName/score', urlencodedParser, async(req, res) => 
     }
 
     const quotient = Math.floor(100 / total)
-    const percent = Math.round(quotient * score)
+    var percent = Math.round(quotient * score)
 
+    if (incorrect == 0) {
+        g = 'None Wrong!'
+        percent = 100
+    } else {
+        g = `${incorrect} out of ${total}`
+    }
     
     res.send(`<!DOCTYPE html>
         <html>
@@ -238,7 +238,7 @@ app.get('/take/:quizName/:userName/score', urlencodedParser, async(req, res) => 
                 <h2>Number Correct:</h2>
                     <strong>${score} out of ${total}</strong>
                 <h2>Number Incorrect:</h2>
-                    <strong>${incorrect} out of ${total}</strong>
+                    <strong>${g}</strong>
                 <h2>Percentage Score:</h2>
                     <strong>${percent}%</strong>
                 <br />
@@ -252,10 +252,11 @@ app.post('/delete', urlencodedParser, async(req, res) => {
     const quizName = req.body.quizName
 
     const keys = await db.keys(`${quizName}-*`)
+    console.log(keys)  //TEMP
     await db.del(keys)
     
-    const checkForKeys = await db.keys(`${quizName}-`)  //TEMP
-    console.log(checkForKeys)  //TEMP
+    const checkForKeys = await db.keys(`${quizName}-*`)  // TEMP
+    console.log(checkForKeys)  // TEMP
 
     res.send(`<!DOCTYPE html>
         <html>
