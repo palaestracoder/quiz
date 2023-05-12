@@ -77,7 +77,7 @@ app.post('/add/:quizName/:count', urlencodedParser, async (req, res) => {
                     <button type="submit">Click Here to Submit This Question</button>
                 </form>
                 <br />
-                <strong>Simply click <em><a href="http://localhost/home.html">done</a></em> when you're finished adding questions!</strong>
+                <strong>Simply click <em><a href="/home.html">done</a></em> when you're finished adding questions!</strong>
     </body>
     </html>`)    
 })
@@ -116,7 +116,7 @@ app.post('/take', urlencodedParser, async(req, res) => {
                 Perhaps you could check your spelling, capitalization, and punctuation if you believe there is an issue.<br />
                 Also, the quiz you entered may have been deleted.<br />
                 <br />
-                <strong>Don't worry; click <em><a href="http://localhost">here</a></em> to return to the homepage.</strong>
+                <strong>Don't worry; click <em><a href="">here</a></em> to return to the homepage.</strong>
         </body>
        </html>`)
     } else {
@@ -186,7 +186,7 @@ app.post('/take/:quizName/:userName/:questionNum', urlencodedParser, async(req, 
                         <button type="submit">Click Here to Submit Your Answer</button>
                 </form>
                 <br />
-                <strong>Simply click <em><a href="http://localhost/home.html">done</a></em> if you get bored!</strong>
+                <strong>Simply click <em><a href="/home.html">done</a></em> if you get bored!</strong>
         </body>
         </html>`)
     }
@@ -248,7 +248,7 @@ app.get('/take/:quizName/:userName/score', urlencodedParser, async(req, res) => 
                     <strong>${percent}%</strong>
                 <br />
                 <br />
-                <strong>Just click <em><a href="http://localhost/home.html">here</a></em> to return to the homepage.</strong>
+                <strong>Just click <em><a href="/home.html">here</a></em> to return to the homepage.</strong>
         </body>
         </html>`)
 })
@@ -268,7 +268,7 @@ app.post('/delete', urlencodedParser, async(req, res) => {
         </head>
         <body>
             <h1>Whoops! This quiz didn't even exist in the first place!</h1>
-                <strong>Don't worry, just click <em><a href="http://localhost">here</a></em> to return to the homepage.</strong>
+                <strong>Don't worry, just click <em><a href="">here</a></em> to return to the homepage.</strong>
         </body>
         </html>`)
 
@@ -287,7 +287,7 @@ app.post('/delete', urlencodedParser, async(req, res) => {
             </head>    
             <body>
                 <h3> Quiz Deleted successfully <h3>
-                <h4><a href="http://localhost/home.html">Homepage</a></h4>
+                <h4><a href="/home.html">Homepage</a></h4>
             </body>
             </html>`)
 
