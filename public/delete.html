@@ -1,8 +1,18 @@
-<h4> Type in the quiz you would like to delete <h4>
-    <!DOCTYPE html>
-    <html>
-        <form action="http://localhost/delete" method="post">
-            <textarea id="quizName" name="quizName" rows="1" cols="20"></textarea>
-            <button type="submit">Click to Submit Deletion</button>
-        </form>
-    </html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Fabulous Quiz Server( ͡° ͜ʖ ͡°)</title>
+</head>
+<body>
+
+<form action="/delete" method="POST">
+
+    <p>Enter a quiz name:</p>
+    <input id="quizName" name="quizName">
+    <button type="submit">Submit</button>
+
+</form>
+
+
+</body>
+</html>
